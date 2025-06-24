@@ -1,6 +1,6 @@
 ---
 title: Skagit Steelhead Forecast
-author: Thomas Buehrens 
+author: Skagit River Comanagers
 output:
   html_document:
     code_folding: hide
@@ -14,12 +14,12 @@ output:
     toc_depth: '3'
 ---
 
-<script>
-   $(document).ready(function() {
-     $head = $('#header');
-     $head.prepend('<img src=\"https://privatelands.wdfw.wa.gov/wdfwlogo_clrnotxt.png"\" style=\"float: right;width: 150px;\"/>')
-   });
-</script>
+<!-- <script> -->
+<!--    $(document).ready(function() { -->
+<!--      $head = $('#header'); -->
+<!--      $head.prepend('<img src=\"https://privatelands.wdfw.wa.gov/wdfwlogo_clrnotxt.png"\" style=\"float: right;width: 150px;\"/>') -->
+<!--    }); -->
+<!-- </script> -->
 
 ***
 
@@ -74,8 +74,8 @@ Here we will load and format our data for analysis. First, we will load and form
 #====================================
 #get Skagit Steelhead data as example
 #====================================
-dat<-read_csv("https://raw.githubusercontent.com/tbuehrens/Skagit-River-Steelhead-Forecast/master/data/skagit_sthd_esc.csv")%>%
-  left_join(read_csv("https://raw.githubusercontent.com/tbuehrens/Skagit-River-Steelhead-Forecast/master/data/skagit_sthd_catch.csv"))%>%
+dat<-read_csv("https://raw.githubusercontent.com/casruff/Skagit-River-Steelhead-Forecast/master/data/skagit_sthd_esc.csv")%>%
+  left_join(read_csv("https://raw.githubusercontent.com/casruff/Skagit-River-Steelhead-Forecast/master/data/skagit_sthd_catch.csv"))%>%
   mutate(runsize_obs=catch+escapement)%>%
   dplyr::rename(Year=year)
 
@@ -93,6 +93,7 @@ The section will (optionally) download from the web (or load from the data folde
 #=============
 #get flow data
 #=============
+
 flow<-get_flow_data(flow_site =  12200500, min_year = min(dat$Year),max_year = max(dat$Year))%>%
     mutate(Year=year(Date),Month=month(Date),Year=ifelse(Month>5,Year + 1, Year))%>%
     group_by(Year)%>%
@@ -113,7 +114,7 @@ flow<-get_flow_data(flow_site =  12200500, min_year = min(dat$Year),max_year = m
 #=========================================================
 #get NPGO data
 #=========================================================
-NPGO<-read_table("http://www.o3d.org/npgo/npgo.php",skip=29,col_names=F,comment="#")%>%
+NPGO<-read_table("https://www.o3d.org/npgo/data/NPGO.txt",skip=29,col_names=F,comment="#")%>%
   filter(!is.na(X2))%>%
   dplyr::rename(Year=X1,Month=X2,NPGO=X3)%>%
   mutate(Year=as.numeric(Year))%>%
@@ -529,6 +530,9 @@ ggplot(data=best_model,aes(x=Year,y=Estimate,color=Model))+
 best_mu<-log(best_model%>%filter(Year==max(Year))%>%dplyr::select(Estimate))%>%unlist()
 best_sd<-best_model%>%filter(Year==max(Year))%>%dplyr::select(sd)%>%unlist()
 best_draws=data.frame(Estimate=rlnorm(25000,mean=best_mu,sd=best_sd[1]))
+steelhead_forecast <- write.csv(best_draws,"steelheadforecast.csv")
+
+
 
 #=========================
 #Best model final year pdf
