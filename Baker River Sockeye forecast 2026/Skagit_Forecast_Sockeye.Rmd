@@ -89,7 +89,7 @@ dat <- dat%>%
 
 SAR<-dat%>%
   right_join(Yrlist)%>%
-  filter(Year<2024)
+  filter(Year<2025)
 
 SAR<-SAR%>%bind_cols(SAR1=data.frame(SAR1=gam(cbind(round(OA1_Recruits),smolts-round(OA1_Recruits))~s(Year,k=(dim(SAR)[1]),m=1,bs="ps"),family=quasibinomial,data=SAR)$fitted))%>%
   bind_cols(SAR2=data.frame(SAR2=c(NA,gam(cbind(round(OA2_Recruits),smolts-round(OA2_Recruits))~s(Year,k=(dim(SAR)[1]-1),m=1,bs="ps"),family=quasibinomial,data=SAR)$fitted)))%>%
@@ -132,13 +132,13 @@ NPGO<-read_table("https://www.o3d.org/npgo/data/NPGO.txt",skip=29,col_names=F,co
 #get NOAA indicator data, wrangle into usable format, plot
 #=========================================================
 #indicators<-read_csv("https://media.fisheries.noaa.gov/2021-04/Stoplight%20csv.csv?null",skip=1)%>%
-indicators<-read_csv("data/Stoplight csv.csv",skip=1)%>%
-  filter(!is.na(`Ecosystem Indicators`))%>%
-  pivot_longer(names_to = "Year",
-                cols=c(starts_with("1"),starts_with("2")),
-                values_to = "value")%>%
-  pivot_wider(names_from=`Ecosystem Indicators`,values_from=value)%>%
-  mutate(Year=as.numeric(Year))
+# indicators<-read_csv("data/Stoplight csv.csv",skip=1)%>%
+#   filter(!is.na(`Ecosystem Indicators`))%>%
+#   pivot_longer(names_to = "Year",
+#                 cols=c(starts_with("1"),starts_with("2")),
+#                 values_to = "value")%>%
+#   pivot_wider(names_from=`Ecosystem Indicators`,values_from=value)%>%
+#   mutate(Year=as.numeric(Year))
 
 # plotdat<-indicators%>%pivot_longer(names_to = "indicators", cols = colnames(indicators)[colnames(indicators)!="Year"])
 # ggplot(plotdat,aes(x=value,color=indicators))+
@@ -688,7 +688,7 @@ ggplot(data=ensemble_results$ensembles,aes(x=Year,y=Estimate,color=Model))+
   geom_point(data=dat,mapping=aes(x=Year,y=runsize_obs),size=2,color="black")+
   ylim(0,NA)+
   theme_bw()
-```
+````
 
 # Best Model
 Identify the best model and plot and summarize its results
@@ -742,4 +742,4 @@ best_model%>%
   kbl(caption = "Table 5. Best model forecasts one Year ahead of final Year of data.",digits =0)%>%
   kable_classic(full_width = F, html_font = "Cambria")
 
-```
+````
